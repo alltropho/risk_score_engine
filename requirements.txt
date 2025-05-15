@@ -1,0 +1,5 @@
+pandas>=2.2
+pyyaml
+thefuzz>=0.22
+xlsxwriter
+jinja2

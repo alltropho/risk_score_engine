@@ -1,0 +1,418 @@
+# Risk-Score Engine — catalogue of clinical scales
+# Version 0.9 – 15 May 2025
+# Units are documented for each variable but NOT enforced by the engine.
+# Adapt or convert your data if units differ.
+
+BMI:
+  variables:
+    weight: {unit: "kg"}
+    height: {unit: "cm"}
+  formula: |
+    bmi = weight / (height/100)**2
+  interpretation:
+    - {min: 0, max: 18.49, label: "Underweight"}
+    - {min: 18.5, max: 24.99, label: "Normal"}
+    - {min: 25, max: 29.99, label: "Overweight"}
+    - {min: 30, max: 100, label: "Obese"}
+
+CHA2DS2_VASc:
+  variables:
+    age: {unit: "years"}
+    sex: {unit: "M/F"}           # 'F' counts 1 point
+    htn: {unit: "bool"}
+    dm: {unit: "bool"}
+    stroke: {unit: "bool"}       # Prior stroke/TIA
+    hf: {unit: "bool"}           # Heart failure
+    vascular: {unit: "bool"}     # Vascular disease
+  formula: |
+    score = int(sex=="F") + htn + dm + vascular + hf + (2 if stroke else 0)           + (2 if age >= 75 else (1 if 65 <= age < 75 else 0))
+  interpretation:
+    - {min: 0, max: 0, label: "Low"}
+    - {min: 1, max: 1, label: "Intermediate"}
+    - {min: 2, max: 10, label: "High"}
+
+HAS_BLED:
+  variables:
+    htn: {unit: "bool"}             # Uncontrolled hypertension
+    renal: {unit: "bool"}           # Renal dysfunction
+    liver: {unit: "bool"}           # Liver dysfunction
+    stroke_history: {unit: "bool"}
+    bleeding_history: {unit: "bool"}
+    labile_inr: {unit: "bool"}
+    age: {unit: "years"}
+    drugs_alcohol: {unit: "bool"}   # Drugs or alcohol
+  formula: |
+    score = htn + renal + liver + stroke_history + bleeding_history + labile_inr           + (1 if age >= 65 else 0) + drugs_alcohol
+  interpretation:
+    - {min: 0, max: 2, label: "Low"}
+    - {min: 3, max: 9, label: "High"}
+
+CURB_65:
+  variables:
+    confusion: {unit: "bool"}
+    urea: {unit: "mmol/L"}
+    respiratory_rate: {unit: "breaths/min"}
+    sbp: {unit: "mmHg"}
+    dbp: {unit: "mmHg"}
+    age: {unit: "years"}
+  formula: |
+    score = confusion + (1 if urea > 7 else 0) + (1 if respiratory_rate >= 30 else 0)           + (1 if sbp < 90 or dbp <= 60 else 0) + (1 if age >= 65 else 0)
+  interpretation:
+    - {min: 0, max: 1, label: "Outpatient"}
+    - {min: 2, max: 2, label: "Short stay / close"}
+    - {min: 3, max: 5, label: "Hospital / ICU"}
+
+qSOFA:
+  variables:
+    sbp: {unit: "mmHg"}
+    gcs: {unit: "score"}          # Glasgow Coma Scale total
+    respiratory_rate: {unit: "breaths/min"}
+  formula: |
+    score = (1 if sbp <= 100 else 0) + (1 if gcs < 15 else 0) + (1 if respiratory_rate >= 22 else 0)
+  interpretation:
+    - {min: 0, max: 1, label: "Low"}
+    - {min: 2, max: 3, label: "High"}
+
+SOFA:
+  variables:
+    pao2_fio2: {unit: "ratio"}           # PaO2 / FiO2
+    platelets: {unit: "10^9/L"}
+    bilirubin: {unit: "mg/dL"}
+    map_or_vasopressor: {unit: "bool"}   # MAP < 70 or vasopressors
+    gcs: {unit: "score"}                 # Glasgow
+    creatinine: {unit: "mg/dL"}
+  formula: |
+    resp = 0 if pao2_fio2 >= 400 else (1 if pao2_fio2 >= 300 else (2 if pao2_fio2 >= 200 else (3 if pao2_fio2 >= 100 else 4)))
+    coag = 0 if platelets >= 150 else (1 if platelets >= 100 else (2 if platelets >= 50 else (3 if platelets >= 20 else 4)))
+    liver = 0 if bilirubin < 1.2 else (1 if bilirubin < 2.0 else (2 if bilirubin < 6.0 else (3 if bilirubin < 12.0 else 4)))
+    cardio = 0 if not map_or_vasopressor else 2
+    cns = 0 if gcs == 15 else (1 if gcs >= 13 else (2 if gcs >= 10 else (3 if gcs >= 6 else 4)))
+    renal = 0 if creatinine < 1.2 else (1 if creatinine < 2.0 else (2 if creatinine < 3.5 else (3 if creatinine < 5.0 else 4)))
+    score = resp + coag + liver + cardio + cns + renal
+  interpretation:
+    - {min: 0, max: 4, label: "Low"}
+    - {min: 5, max: 7, label: "Moderate"}
+    - {min: 8, max: 24, label: "High"}
+
+ROX_index:
+  variables:
+    spo2: {unit: "%"}
+    fio2: {unit: "fraction"}      # 0.21–1.0
+    respiratory_rate: {unit: "breaths/min"}
+  formula: |
+    score = (spo2 / fio2) / respiratory_rate
+  interpretation:
+    - {min: 0, max: 4.88, label: "High risk of intubation"}
+    - {min: 4.88, max: 100, label: "Low risk"}
+
+Child_Pugh:
+  variables:
+    bilirubin: {unit: "mg/dL"}
+    albumin: {unit: "g/dL"}
+    inr: {unit: "-"}
+    ascites: {unit: "grade"}        # 1=None, 2=Mild, 3=Moderate
+    encephalopathy: {unit: "grade"} # 1=None, 2=I–II, 3=III–IV
+  formula: |
+    b_pts = 1 if bilirubin < 2 else (2 if bilirubin <= 3 else 3)
+    a_pts = 1 if albumin > 3.5 else (2 if albumin >= 2.8 else 3)
+    i_pts = 1 if inr < 1.7 else (2 if inr <= 2.3 else 3)
+    score = b_pts + a_pts + i_pts + ascites + encephalopathy
+  interpretation:
+    - {min: 5, max: 6, label: "Class A"}
+    - {min: 7, max: 9, label: "Class B"}
+    - {min: 10, max: 15, label: "Class C"}
+
+MELD_Na:
+  variables:
+    creatinine: {unit: "mg/dL"}
+    bilirubin: {unit: "mg/dL"}
+    inr: {unit: "-"}
+    sodium: {unit: "mmol/L"}
+  formula: |
+    meld = 0.957 * log(creatinine) + 0.378 * log(bilirubin) + 1.12 * log(inr) + 0.643
+    meld_na = meld + 1.59*(135 - sodium)
+    score = max(min(round(meld_na), 40), 6)
+  interpretation:
+    - {min: 6, max: 14, label: "Low"}
+    - {min: 15, max: 20, label: "Intermediate"}
+    - {min: 21, max: 40, label: "High"}
+
+FIB_4:
+  variables:
+    age: {unit: "years"}
+    ast: {unit: "U/L"}
+    alt: {unit: "U/L"}
+    platelets: {unit: "10^9/L"}
+  formula: |
+    score = (age * ast) / (platelets * (alt ** 0.5))
+  interpretation:
+    - {min: 0, max: 1.29, label: "Low fibrosis"}
+    - {min: 1.3, max: 2.67, label: "Indeterminate"}
+    - {min: 2.68, max: 100, label: "Advanced fibrosis"}
+
+CKD_EPI:
+  variables:
+    creatinine: {unit: "mg/dL"}
+    age: {unit: "years"}
+    sex: {unit: "M/F"}
+  formula: |
+    kappa = 0.7 if sex=="F" else 0.9
+    alpha = -0.329 if sex=="F" else -0.411
+    min_part = min(creatinine / kappa, 1) ** alpha
+    max_part = max(creatinine / kappa, 1) ** -1.209
+    score = 141 * min_part * max_part * (0.993 ** age) * (1.018 if sex=="F" else 1)
+  interpretation:
+    - {min: 0, max: 14, label: "Kidney failure G5"}
+    - {min: 15, max: 29, label: "Severe G4"}
+    - {min: 30, max: 44, label: "Moderate G3b"}
+    - {min: 45, max: 59, label: "Moderate G3a"}
+    - {min: 60, max: 89, label: "Mild G2"}
+    - {min: 90, max: 200, label: "Normal G1"}
+
+HOMA_IR:
+  variables:
+    fasting_glucose: {unit: "mmol/L"}
+    fasting_insulin: {unit: "µIU/mL"}
+  formula: |
+    score = (fasting_glucose * fasting_insulin) / 22.5
+  interpretation:
+    - {min: 0, max: 1.9, label: "Normal"}
+    - {min: 2, max: 2.9, label: "Borderline"}
+    - {min: 3, max: 100, label: "Insulin resistance"}
+
+Glasgow_Coma_Scale:
+  variables:
+    eye: {unit: "score"}        # 1‑4
+    verbal: {unit: "score"}     # 1‑5
+    motor: {unit: "score"}      # 1‑6
+  formula: |
+    score = eye + verbal + motor
+  interpretation:
+    - {min: 3, max: 8, label: "Severe"}
+    - {min: 9, max: 12, label: "Moderate"}
+    - {min: 13, max: 15, label: "Mild"}
+
+GRACE:
+  variables:
+    age: {unit: "years"}
+    heart_rate: {unit: "beats/min"}
+    sbp: {unit: "mmHg"}
+    creatinine: {unit: "mg/dL"}
+    killip_class: {unit: "class"}           # 1–4
+    cardiac_arrest: {unit: "bool"}
+    st_deviation: {unit: "bool"}
+    positive_troponin: {unit: "bool"}
+  formula: |
+    points = 0.8*age + 0.1*heart_rate + 0.1*max(0, 140 - sbp) + 10*creatinine            + 20*killip_class + (39 if cardiac_arrest else 0)            + (28 if st_deviation else 0) + (14 if positive_troponin else 0)
+    score = round(points)
+  interpretation:
+    - {min: 0, max: 108, label: "Low"}
+    - {min: 109, max: 140, label: "Intermediate"}
+    - {min: 141, max: 1000, label: "High"}
+
+TIMI_NSTEMI:
+  variables:
+    age: {unit: "years"}
+    cad_risk_factors: {unit: "count"}          # number of risk factors
+    known_cad: {unit: "bool"}                  # ≥50 % stenosis
+    st_deviation: {unit: "bool"}
+    angina_episodes_24h: {unit: "bool"}        # ≥2 episodes /24h
+    aspirin_recent: {unit: "bool"}
+    elevated_troponin: {unit: "bool"}
+  formula: |
+    score = (1 if age >= 65 else 0)           + (1 if cad_risk_factors >= 3 else 0) + known_cad + st_deviation           + angina_episodes_24h + aspirin_recent + elevated_troponin
+  interpretation:
+    - {min: 0, max: 2, label: "Low"}
+    - {min: 3, max: 4, label: "Intermediate"}
+    - {min: 5, max: 7, label: "High"}
+
+HEART:
+  variables:
+    history_component: {unit: "score"}   # 0/1/2
+    ecg_component: {unit: "score"}       # 0/1/2
+    age: {unit: "years"}
+    risk_factor_count: {unit: "count"}
+    troponin_multiple_uln: {unit: "multiple"}   # x ULN
+  formula: |
+    age_pts = 0 if age < 45 else (1 if age < 65 else 2)
+    risk_pts = 0 if risk_factor_count == 0 else (1 if risk_factor_count <= 3 else 2)
+    trop_pts = 0 if troponin_multiple_uln < 1 else (1 if troponin_multiple_uln < 3 else 2)
+    score = history_component + ecg_component + age_pts + risk_pts + trop_pts
+  interpretation:
+    - {min: 0, max: 3, label: "Low"}
+    - {min: 4, max: 6, label: "Moderate"}
+    - {min: 7, max: 10, label: "High"}
+
+Killip:
+  variables:
+    killip_class: {unit: "class"}          # 1–4
+  formula: |
+    score = killip_class
+  interpretation:
+    - {min: 1, max: 1, label: "Class I"}
+    - {min: 2, max: 2, label: "Class II"}
+    - {min: 3, max: 3, label: "Class III"}
+    - {min: 4, max: 4, label: "Class IV"}
+
+Caprini_VTE:
+  variables:
+    caprini_points: {unit: "score"}     # total points
+  formula: |
+    score = caprini_points
+  interpretation:
+    - {min: 0, max: 1, label: "Low"}
+    - {min: 2, max: 4, label: "Moderate"}
+    - {min: 5, max: 8, label: "High"}
+    - {min: 9, max: 100, label: "Highest"}
+
+ASA_PS:
+  variables:
+    asa_class: {unit: "class"}       # 1–6
+  formula: |
+    score = asa_class
+  interpretation:
+    - {min: 1, max: 1, label: "ASA I"}
+    - {min: 2, max: 2, label: "ASA II"}
+    - {min: 3, max: 3, label: "ASA III"}
+    - {min: 4, max: 4, label: "ASA IV"}
+    - {min: 5, max: 5, label: "ASA V"}
+    - {min: 6, max: 6, label: "ASA VI"}
+
+ECOG_PS:
+  variables:
+    ecog_score: {unit: "score"}            # 0–5
+  formula: |
+    score = ecog_score
+  interpretation:
+    - {min: 0, max: 0, label: "Fully active"}
+    - {min: 1, max: 1, label: "Restricted strenuous"}
+    - {min: 2, max: 2, label: "Ambulatory ≥50%"}
+    - {min: 3, max: 3, label: "Limited self‑care"}
+    - {min: 4, max: 4, label: "Completely disabled"}
+    - {min: 5, max: 5, label: "Dead"}
+
+Karnofsky_PS:
+  variables:
+    karnofsky_percent: {unit: "%"}           # 0–100
+  formula: |
+    score = karnofsky_percent
+  interpretation:
+    - {min: 0, max: 40, label: "Unable to care"}
+    - {min: 50, max: 70, label: "Requires assistance"}
+    - {min: 80, max: 100, label: "Normal activity"}
+
+CFS_7:
+  variables:
+    cfs_score: {unit: "score"}            # 1–9
+  formula: |
+    score = cfs_score
+  interpretation:
+    - {min: 1, max: 3, label: "Fit"}
+    - {min: 4, max: 6, label: "Vulnerable/Moderate"}
+    - {min: 7, max: 9, label: "Severe"}
+
+Bishop_Score:
+  variables:
+    dilation_cm: {unit: "cm"}
+    effacement_pct: {unit: "%"}
+    station: {unit: "number"}       # -3…+3
+    consistency: {unit: "score"}    # 0–2
+    position: {unit: "score"}       # 0–2
+  formula: |
+    dil_pts = 0 if dilation_cm == 0 else (1 if dilation_cm <= 2 else (2 if dilation_cm <= 4 else (3 if dilation_cm <= 6 else 4)))
+    eff_pts = 0 if effacement_pct < 30 else (1 if effacement_pct < 50 else (2 if effacement_pct < 80 else 3))
+    stat_pts = 0 if station <= -3 else (1 if station == -2 else (2 if station == -1 else 3))
+    score = dil_pts + eff_pts + stat_pts + consistency + position
+  interpretation:
+    - {min: 0, max: 5, label: "Unfavorable"}
+    - {min: 6, max: 12, label: "Favorable"}
+
+APGAR:
+  variables:
+    heart_rate_score: {unit: "score"}     # 0/1/2
+    respiration_score: {unit: "score"}    # 0/1/2
+    muscle_tone_score: {unit: "score"}
+    reflex_score: {unit: "score"}
+    color_score: {unit: "score"}
+  formula: |
+    score = heart_rate_score + respiration_score + muscle_tone_score + reflex_score + color_score
+  interpretation:
+    - {min: 0, max: 3, label: "Severe distress"}
+    - {min: 4, max: 6, label: "Moderate"}
+    - {min: 7, max: 10, label: "Normal"}
+
+RIFLE:
+  variables:
+    creatinine_ratio: {unit: "ratio"}      # current / baseline
+    urine_output_mlkg: {unit: "mL/kg/h"}
+  formula: |
+    if creatinine_ratio >= 3 or urine_output_mlkg < 0.3:
+        score = 3
+    elif creatinine_ratio >= 2 or urine_output_mlkg < 0.5:
+        score = 2
+    elif creatinine_ratio >= 1.5:
+        score = 1
+    else:
+        score = 0
+  interpretation:
+    - {min: 0, max: 0, label: "None"}
+    - {min: 1, max: 1, label: "Risk"}
+    - {min: 2, max: 2, label: "Injury"}
+    - {min: 3, max: 3, label: "Failure"}
+
+AKIN:
+  variables:
+    creatinine_increase: {unit: "mg/dL"}      # absolute
+    creatinine_ratio: {unit: "ratio"}         # current / baseline
+    urine_output_mlkg: {unit: "mL/kg/h"}
+  formula: |
+    if creatinine_increase >= 0.5 or creatinine_ratio >= 3 or urine_output_mlkg < 0.3:
+        score = 3
+    elif creatinine_increase >= 0.3 or creatinine_ratio >= 2 or urine_output_mlkg < 0.5:
+        score = 2
+    elif creatinine_increase >= 0.3 or creatinine_ratio >= 1.5:
+        score = 1
+    else:
+        score = 0
+  interpretation:
+    - {min: 0, max: 0, label: "Stage 0"}
+    - {min: 1, max: 1, label: "Stage 1"}
+    - {min: 2, max: 2, label: "Stage 2"}
+    - {min: 3, max: 3, label: "Stage 3"}
+
+TRISS:
+  variables:
+    revised_trauma_score: {unit: "score"}    # RTS
+    injury_severity_score: {unit: "score"}   # ISS
+    age: {unit: "years"}
+  formula: |
+    b = -0.4499 + (0.8085 * revised_trauma_score) - (0.0835 * injury_severity_score) - (1.743 * (1 if age >= 55 else 0))
+    score = 1 / (1 + exp(-b)) * 100            # probability of survival %
+  interpretation:
+    - {min: 0, max: 25, label: "Low survival likelihood"}
+    - {min: 26, max: 50, label: "Intermediate"}
+    - {min: 51, max: 100, label: "High"}
+
+Framingham_CHD_10yr:
+  variables:
+    age: {unit: "years"}
+    sex: {unit: "M/F"}
+    total_chol: {unit: "mg/dL"}
+    hdl: {unit: "mg/dL"}
+    sbp: {unit: "mmHg"}
+    bp_treated: {unit: "bool"}
+    smoker: {unit: "bool"}
+    diabetes: {unit: "bool"}
+  formula: |
+    # Simplified point model
+    age_pts = (age-20)//5
+    chol_pts = (total_chol - 160)//20
+    hdl_pts = -1 if hdl >= 60 else (0 if hdl >= 50 else (1 if hdl >= 40 else 2))
+    sbp_pts = ((sbp - 120)//10) + (2 if bp_treated else 0)
+    smoke_pts = 4 if smoker else 0
+    dm_pts = 3 if diabetes else 0
+    score = age_pts + chol_pts + hdl_pts + sbp_pts + smoke_pts + dm_pts
+  interpretation:
+    - {min: -10, max: 9, label: "<10% 10‑yr risk"}
+    - {min: 10, max: 12, label: "10–20%"}
+    - {min: 13, max: 100, label: ">20%"}

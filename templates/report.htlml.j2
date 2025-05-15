@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчёт по пациенту {{ patient_id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #2F4F4F; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; text-align: left; }
+        .missed { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Пациент {{ patient_id }}</h1>
+    <h2>Сырые данные</h2>
+    <table>
+        <thead><tr><th>Показатель</th><th>Значение</th></tr></thead>
+        <tbody>
+        {% for k, v in raw.items() %}
+            <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <h2>Рассчитанные шкалы</h2>
+    {% if computed %}
+    <table>
+        <thead><tr><th>Шкала</th><th>Значение</th></tr></thead>
+        <tbody>
+        {% for name, val in computed.items() %}
+            <tr><td>{{ name }}</td><td>{{ val }}</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>Нет рассчитанных шкал.</p>
+    {% endif %}
+    {% if missed %}
+    <h2 class="missed">Пропущенные шкалы</h2>
+    <ul>
+    {% for name, vars in missed.items() %}
+        <li>{{ name }} — нет данных по: {{ vars|join(", ") }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+</body>
+</html>

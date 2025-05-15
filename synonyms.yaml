@@ -1,0 +1,332 @@
+age:
+- Age
+- age_years
+- возраст
+sex:
+- Sex
+- gender
+- пол
+weight:
+- Weight
+- weight_kg
+- вес
+height:
+- Height
+- height_cm
+- рост
+htn:
+- HTN
+- Hypertension
+- гипертензия
+dm:
+- DM
+- Diabetes
+- СД
+- diabetes_mellitus
+stroke:
+- Stroke
+- CVA
+- инсульт
+- TIA
+hf:
+- HF
+- CHF
+- сердечная недостаточность
+vascular:
+- vascular_disease
+- CAD
+- IHD
+- ПНС
+mi:
+- MI
+- Myocardial_infarction
+- инфаркт
+chf:
+- CHF
+- ХСН
+- heart_failure
+pvd:
+- PVD
+- peripheral_vascular
+- облитерирующий
+cva:
+- CVA
+- cerebrovascular
+- инсульт
+dementia:
+- Dementia
+- деменция
+copd:
+- COPD
+- хобл
+connective:
+- connective_tissue
+- CTD
+- СКВ
+ulcer:
+- Ulcer
+- язва
+liver_mild:
+- mild_liver
+- легкая_печень
+liver_severe:
+- severe_liver
+- тяж_печень
+renal:
+- Renal
+- Kidney
+- ХБП
+tumor:
+- Tumor
+- cancer_any
+- опухоль
+leukemia:
+- Leukemia
+- лейкоз
+lymphoma:
+- Lymphoma
+- лимфома
+mets:
+- Metastasis
+- метастазы
+aids:
+- AIDS
+- HIV
+- ВИЧ
+confusion:
+- Confusion
+- спутанность
+urea:
+- Urea
+- BUN
+- мочевина
+respiratory_rate:
+- RR
+- resp_rate
+- ЧД
+sbp:
+- SBP
+- systolic_bp
+- САД
+dbp:
+- DBP
+- diastolic_bp
+- ДАД
+gcs:
+- GCS_total
+- glasgow_total
+pao2_fio2:
+- PF_ratio
+- PaO2/FiO2
+- PFratio
+platelets:
+- PLT
+- platelets
+- тромбоциты
+bilirubin:
+- Bili
+- bilirubin_total
+- билирубин
+map_or_vasopressor:
+- MAP_low
+- vasopressors
+creatinine:
+- Cr
+- creatinin
+- креатинин
+spo2:
+- SpO2
+- saturation
+- сатурация
+fio2:
+- FiO2
+- fio2_fraction
+- кислород
+albumin:
+- Alb
+- albumin
+- альбумин
+ascites:
+- Ascites
+- асцит
+encephalopathy:
+- Encephalopathy
+- печеночная_энцефалопатия
+inr:
+- INR
+- МНО
+sodium:
+- Na
+- sodium
+- натрий
+ast:
+- AST
+- GOT
+- АСТ
+alt:
+- ALT
+- GPT
+- АЛТ
+fasting_glucose:
+- Glucose
+- glu_fasting
+- глюкоза_натощак
+fasting_insulin:
+- Insulin
+- insulin_fasting
+- инсулин_натощак
+eye:
+- GCS_eye
+- eye_opening
+verbal:
+- GCS_verbal
+- verbal_response
+motor:
+- GCS_motor
+- motor_response
+heart_rate:
+- HR
+- Pulse
+- ЧСС
+killip_class:
+- Killip
+- killip
+cardiac_arrest:
+- Cardiac_arrest
+- OHCA
+st_deviation:
+- ST_deviation
+- ST_change
+positive_troponin:
+- Pos_trop
+- elevated_troponin
+- тропонин_плюс
+cad_risk_factors:
+- CAD_risk
+- risk_factors
+- факторы_риска
+known_cad:
+- Known_CAD
+- CAD_history
+angina_episodes_24h:
+- Angina_24h
+- multiple_angina
+aspirin_recent:
+- Aspirin_7d
+- aspirin_use
+elevated_troponin:
+- Elev_trop
+- troponin_high
+history_component:
+- HEART_history
+- history_score
+ecg_component:
+- HEART_ecg
+- ecg_score
+risk_factor_count:
+- RF_count
+- risk_factors_total
+troponin_multiple_uln:
+- Trop_ULN
+- troponin_xULN
+caprini_points:
+- Caprini
+- caprini_score
+asa_class:
+- ASA
+- asa_score
+ecog_score:
+- ECOG
+- ecog
+karnofsky_percent:
+- Karnofsky
+- karnofsky
+cfs_score:
+- CFS
+- frailty_score
+dilation_cm:
+- Dilation
+- dilatation
+effacement_pct:
+- Effacement
+- eff_pct
+station:
+- Station
+- fetal_station
+consistency:
+- Consistency
+- cervical_consistency
+position:
+- Position
+- cervical_position
+creatinine_ratio:
+- Cr_ratio
+- creatinine_ratio
+urine_output_mlkg:
+- UO_mlkg
+- urine_output
+creatinine_increase:
+- Cr_increase
+- creatinine_delta
+revised_trauma_score:
+- RTS
+- revised_trauma
+injury_severity_score:
+- ISS
+- injury_severity
+total_chol:
+- Chol_total
+- total_cholesterol
+hdl:
+- HDL
+- hdl_cholesterol
+bp_treated:
+- BP_treated
+- antihypertensive
+smoker:
+- Smoker
+- smoking_status
+bleeding_history:
+- Bleeding_history
+- bleeding_prev
+- кровотечение_анамнез
+stroke_history:
+- Stroke_history
+- CVA_history
+- инсульт_анамнез
+labile_inr:
+- Labile_INR
+- INR_unstable
+- лабильный_INR
+drugs_alcohol:
+- Drugs_alcohol
+- alcohol_drugs
+- алкоголь_препараты
+liver:
+- Liver
+- hepatic_dysfunction
+- печень
+heart_rate_score:
+- HR_score
+- heart_rate_apgar
+- сердцебиение_апгар
+respiration_score:
+- Resp_score
+- respiration_apgar
+- дыхание_апгар
+muscle_tone_score:
+- Tone_score
+- muscle_tone_apgar
+- мышечный_тонус_апгар
+reflex_score:
+- Reflex_score
+- grimace_apgar
+- рефлексы_апгар
+color_score:
+- Color_score
+- appearance_apgar
+- цвет_апгар
+diabetes:
+- Diabetes
+- DM
+- СД
